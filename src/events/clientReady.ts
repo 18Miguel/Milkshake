@@ -1,7 +1,11 @@
 import { ActivitiesOptions, ActivityType, Events, PresenceUpdateStatus } from 'discord.js'
-import { Logger, loadSlashCommands, registerSlashCommands } from '../helpers'
+import { Logger, loadSlashCommands, recordSlashCommands } from '../helpers'
 import { IMilkshakeClient } from '../interfaces/milkshakeClient'
 import { IEventHandler } from '../interfaces/eventHandler'
+import { database, guilds } from '../database'
+import { sql } from 'drizzle-orm'
+
+const prepareGuildInsert = database.insert(guilds).values({ id: sql.placeholder('id') }).prepare()
 
 async function handleClientReady(client: IMilkshakeClient) {
   const CustomStatus: Array<ActivitiesOptions[]> = [
@@ -19,13 +23,20 @@ async function handleClientReady(client: IMilkshakeClient) {
   setInterval(() => {
     client.user?.setPresence({
       activities: CustomStatus[Math.floor(Math.random() * (CustomStatus.length))],
-      status: PresenceUpdateStatus.Online
+      status: PresenceUpdateStatus.Online,
     })
   }, 1000 * 60)
 
   client.logger = new Logger(client)
+
+  try {
+    client.guilds.valueOf().forEach((guild) => {
+      prepareGuildInsert.run({ id: guild.id })
+    })
+  } catch (ignored) {}
+
   await loadSlashCommands(client)
-  await registerSlashCommands(client)
+  await recordSlashCommands(client)
   
   console.info(`\n\n${client.user?.displayName} is ready to taste!\n`)
   client.logger.logDiscord(`${client.user?.displayName} is ready to taste!`)

@@ -1,5 +1,5 @@
 import { Awaitable, ClientEvents } from 'discord.js'
-import { IMilkshakeClient } from './milkshakeClient';
+import { IMilkshakeClient } from './milkshakeClient'
 
 export interface IEventHandler<Event extends keyof ClientEvents = any> {
   event: Event,

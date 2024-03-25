@@ -1,6 +1,6 @@
 import { createId } from '@paralleldrive/cuid2'
 import { relations } from 'drizzle-orm'
-import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const guilds = sqliteTable('guilds', {
   id: text('id').primaryKey(),
@@ -8,17 +8,30 @@ export const guilds = sqliteTable('guilds', {
   birthdayChannel: text('birthday_channel'),
 })
 
-export const users = sqliteTable('users', {
-  id: text('id').primaryKey(),
-  birthdayDate: text('birthday_date'),
-})
-
 export const guildsRelations = relations(guilds, ({ many }) => ({
-  users: many(users),
+  guildsToUsers: many(guildsToUsers),
 }))
 
+export const users = sqliteTable('users', {
+  id: text('id').primaryKey(),
+  birthdayDate: integer('birthday_date', { mode: 'timestamp' }),
+})
+
 export const usersRelations = relations(users, ({ many }) => ({
-  guilds: many(guilds),
+  guildsToUsers: many(guildsToUsers),
+}))
+
+export const guildsToUsers = sqliteTable('guilds_to_users', {
+    guildId: text('guild_id').notNull().references(() => guilds.id),
+    userId: text('user_id').notNull().references(() => users.id),
+  }, (table) => ({
+    pk: primaryKey({ columns: [table.guildId, table.userId] }),
+  }),
+)
+
+export const guildsToUsersRelations = relations(guildsToUsers, ({ one }) => ({
+  guild: one(guilds, { fields: [guildsToUsers.guildId], references: [guilds.id] }),
+  user: one(users, { fields: [guildsToUsers.userId], references: [users.id] }),
 }))
 
 export const youTubeChannels = sqliteTable('youtube_channels', {
@@ -33,6 +46,6 @@ export const youTubeSubscriptions = sqliteTable('youtube_subscriptions', {
 })
 
 export const youTubeSubscriptionsRelations = relations(youTubeSubscriptions, ({ one }) => ({
-  youTubeChannels: one(youTubeChannels, { fields: [youTubeSubscriptions.id], references: [youTubeChannels.id] }),
-  guilds: one(guilds, { fields: [youTubeSubscriptions.id], references: [guilds.id] }),
+  youTubeChannel: one(youTubeChannels, { fields: [youTubeSubscriptions.id], references: [youTubeChannels.id] }),
+  guild: one(guilds, { fields: [youTubeSubscriptions.id], references: [guilds.id] }),
 }))

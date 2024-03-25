@@ -6,7 +6,9 @@ async function handleInteractionCreate(client: IMilkshakeClient, interaction: In
   if (interaction.isChatInputCommand()) {
     try {
       const slashCommand = client.slashCommands.get(interaction.commandName)
-      if (!slashCommand) return
+      if (!slashCommand) {
+        throw new Error(`${interaction.commandName}, slash command not found`)
+      }
       slashCommand.execute(client, interaction)
 
     } catch (error) {

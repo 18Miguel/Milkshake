@@ -1,11 +1,13 @@
 import { PermissionFlagsBits, SlashCommandBuilder, TextChannel } from 'discord.js'
-import { ISlashCommand } from '../interfaces/slashCommand'
+import { ISlashCommand, SlashCommandTypeLevel } from '../interfaces/slashCommand'
 
-const clearChannel: ISlashCommand = {
+const ClearChannel: ISlashCommand = {
+  type: SlashCommandTypeLevel.Guild,
+
   data: new SlashCommandBuilder()
     .setName('clear-channel')
     .setDescription('Deletes up to 100 messages from this channel. \nPinned messages will be kept.')
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
     .addIntegerOption(option =>
       option.setName('amount')
         .setDescription('Number of messages to delete.')
@@ -53,4 +55,4 @@ const clearChannel: ISlashCommand = {
   },
 }
 
-export default clearChannel
+export default ClearChannel

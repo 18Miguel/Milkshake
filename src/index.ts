@@ -15,5 +15,4 @@ const client = new Client({
 
 loadEvents(client)
 
-
 client.login(env.DISCORD_TOKEN)

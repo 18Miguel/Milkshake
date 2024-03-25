@@ -1,7 +1,9 @@
 import { SlashCommandBuilder } from 'discord.js'
-import { ISlashCommand } from '../interfaces/slashCommand'
+import { ISlashCommand, SlashCommandTypeLevel } from '../interfaces/slashCommand'
 
-const joke: ISlashCommand = {
+const Joke: ISlashCommand = {
+  type: SlashCommandTypeLevel.Application,
+
   data: new SlashCommandBuilder()
     .setName('joke')
     .setDescription('Milkshake tells a random joke!'),
@@ -32,4 +34,4 @@ const joke: ISlashCommand = {
   },
 }
 
-export default joke
+export default Joke

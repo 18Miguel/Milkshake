@@ -1,7 +1,9 @@
 import { Colors, EmbedBuilder, SlashCommandBuilder } from 'discord.js'
-import { ISlashCommand } from '../interfaces/slashCommand'
+import { ISlashCommand, SlashCommandTypeLevel } from '../interfaces/slashCommand'
 
-const ping: ISlashCommand = {
+const Ping: ISlashCommand = {
+  type: SlashCommandTypeLevel.Application,
+
   data: new SlashCommandBuilder()
     .setName('health')
     .setDescription('Confirms that the Milkshake is still tasty'),
@@ -23,4 +25,4 @@ const ping: ISlashCommand = {
   },
 }
 
-export default ping
+export default Ping
