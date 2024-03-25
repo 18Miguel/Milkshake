@@ -2,8 +2,11 @@ import { Routes } from 'discord.js'
 import { IMilkshakeClient } from '../interfaces/milkshakeClient'
 import { ISlashCommand, SlashCommandTypeLevel } from '../interfaces/slashCommand'
 import { recordGuildSlashCommands } from './recordGuildSlashCommands'
+import { env } from '../env'
 
 export async function recordSlashCommands(client: IMilkshakeClient) {
+  if (!env.LOAD_SLASH_COMMANDS) return
+
   try {
     const guildIds = client.guilds.valueOf().map(guild => guild.id)
     const slashCommandsFiltered = client.slashCommands.reduce((accumulator, value) => {
@@ -19,7 +22,7 @@ export async function recordSlashCommands(client: IMilkshakeClient) {
 		guildIds.forEach(async (guildId) => {
       await recordGuildSlashCommands(client, guildId, slashCommandsFiltered.guild)
     })
-    client.logger.log('registerSlashCommands', 'Successfully reloaded application (/) slash commands')
+    client.logger.log('recordSlashCommands', 'Successfully reloaded application (/) slash commands')
 
   } catch (error) {
     console.error(error)

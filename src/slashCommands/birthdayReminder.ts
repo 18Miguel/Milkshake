@@ -13,11 +13,9 @@ const findNextBirthdays = database
   .select({ id: users.id, birthdayDate: users.birthdayDate })
   .from(users)
   .innerJoin(guildsToUsers, eq(users.id, guildsToUsers.userId))
-  .where(and(
-    sql`strftime('%m-%d', date(${users.birthdayDate}, 'auto')) >= strftime('%m-%d', date('now', 'auto'))`,
-    eq(guildsToUsers.guildId, sql.placeholder('guildId'))
-  ))
-  .orderBy(sql`strftime('%m-%d', date(${users.birthdayDate}, 'auto')) ASC`)
+  .where(eq(guildsToUsers.guildId, sql.placeholder('guildId')))
+  .orderBy(sql`timediff(strftime('2000-%m-%d', date(${users.birthdayDate}, 'auto')), strftime('2000-%m-%d', date('now', 'auto'))) ASC`)
+  .limit(sql.placeholder('limit'))
   .prepare()
 
 async function handleAddBirthday(interaction: ChatInputCommandInteraction) {
@@ -66,7 +64,7 @@ async function handleAddBirthday(interaction: ChatInputCommandInteraction) {
 async function handleRemoveBirthday(interaction: ChatInputCommandInteraction) {
   const userID = interaction.user.id
 
-  await database.delete(guildsToUsers)
+  const deleteResult = await database.delete(guildsToUsers)
     .where(and(eq(guildsToUsers.guildId, interaction.guildId!), eq(guildsToUsers.userId, userID)))
   const countUserResult = (await database
     .select({ count: count() })
@@ -80,7 +78,9 @@ async function handleRemoveBirthday(interaction: ChatInputCommandInteraction) {
 
   await interaction.reply({
     ephemeral: true,
-    content: 'Your birthday data has been successfully removed.',
+    content: deleteResult.changes === 0
+      ? 'Whoa there, birthday slayer! No birthday data to vanquish today.'
+      : 'Mission accomplished! Your birthday data has been blasted off to oblivion.',
   })
 }
 
@@ -114,10 +114,7 @@ async function handleUpcomingBirthdays(interaction: ChatInputCommandInteraction)
     })
   })
 
-  await interaction.reply({
-      embeds: [birthdaysEmbed],
-      ephemeral: true
-  })
+  await interaction.reply({ embeds: [birthdaysEmbed] })
 }
 
 const BirthdayReminder: ISlashCommand = {

@@ -18,7 +18,7 @@ export async function loadSlashCommands(client: IMilkshakeClient) {
       client.logger.log('loadSlashCommands', `✔ ${file} loaded!`)
 
     } catch (ignored) {
-      console.error(`Error loading slash command file: "${file}"`)
+      console.error(`Error loading slash command file: "${file}"`, ignored)
       process.exit(1)
     }
   }
