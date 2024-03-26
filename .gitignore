@@ -2,7 +2,7 @@
 /dist
 /node_modules
 package-lock.json
-/database/migrations
+/src/database/migrations
 *.db
 
 # OS
