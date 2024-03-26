@@ -1,5 +1,5 @@
 import { ActivitiesOptions, ActivityType, Events, PresenceUpdateStatus } from 'discord.js'
-import { Logger, loadSlashCommands, recordSlashCommands } from '../helpers'
+import { birthdayScheduler, Logger, loadSlashCommands, recordSlashCommands } from '../helpers'
 import { IMilkshakeClient } from '../interfaces/milkshakeClient'
 import { IEventHandler } from '../interfaces/eventHandler'
 import { database, guilds } from '../database'
@@ -37,8 +37,9 @@ async function handleClientReady(client: IMilkshakeClient) {
 
   await loadSlashCommands(client)
   await recordSlashCommands(client)
+  await birthdayScheduler(client)
   
-  console.info(`\n\n${client.user?.displayName} is ready to taste!\n`)
+  client.logger.log('Milkshake', `${client.user?.displayName} is ready to taste!`)
   client.logger.logDiscord(`${client.user?.displayName} is ready to taste!`)
 }
 
