@@ -1,5 +1,5 @@
 import { CronJob } from 'cron'
-import { count, eq, sql } from 'drizzle-orm'
+import { and, count, eq, gte, sql } from 'drizzle-orm'
 import { IMilkshakeClient } from '../interfaces/milkshakeClient'
 import { database, youtubeChannels, youtubeSubscriptions } from '../database'
 import { getLatestYouTubeVideo } from '../utils'
@@ -15,21 +15,25 @@ const youtubeSubscriptionsPrepare = database
   .where(eq(youtubeSubscriptions.youtubeChannelId, sql.placeholder('youtubeChannelId')))
   .prepare()
 
-const checkLastYouTubeVideo = database
-  .select({ count: count() })
-  .from(youtubeChannels)
-  .where(eq(youtubeChannels.lastVideoId, sql.placeholder('lastVideoId')))
-  .prepare()
-
-export async function loadYouTubeNotifier(client: IMilkshakeClient) {
+export async function youtubeNotifierScheduler(client: IMilkshakeClient) {
   new CronJob('0 */1 * * * *', async () => {
     try {
       for (const youtubeChannel of youtubeChannelsPrepare.all()) {
         const lastVideo = await getLatestYouTubeVideo(client.rssParser, youtubeChannel.id)
-        if (checkLastYouTubeVideo.get({ lastVideoId: lastVideo.id })?.count === 1) continue
+        console.log(youtubeChannel.id, lastVideo.publishDate.getTime())
+        const checkLastYouTubeVideo = database
+          .select({ count: count() })
+          .from(youtubeChannels)
+          .where(and(
+            eq(youtubeChannels.id, youtubeChannel.id),
+            gte(youtubeChannels.lastVideoPublishDate, lastVideo.publishDate)
+          )).get()
+
+        if (checkLastYouTubeVideo?.count === 1) continue
+
         await database
           .update(youtubeChannels)
-          .set({ lastVideoId: lastVideo.id })
+          .set({ lastVideoId: lastVideo.id, lastVideoPublishDate: lastVideo.publishDate })
           .where(eq(youtubeChannels.id, youtubeChannel.id))
 
         for (const youtubeSubscription of youtubeSubscriptionsPrepare.all({ youtubeChannelId: youtubeChannel.id })) {
@@ -40,7 +44,7 @@ export async function loadYouTubeNotifier(client: IMilkshakeClient) {
       }
 
     } catch (error) {
-      client.logger.log('loadYouTubeNotifier', `${error}`)
+      client.logger.log('youtubeNotifierScheduler', `${error}`)
     }
   }).start()
 }
