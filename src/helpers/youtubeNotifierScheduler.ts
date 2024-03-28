@@ -20,7 +20,6 @@ export async function youtubeNotifierScheduler(client: IMilkshakeClient) {
     try {
       for (const youtubeChannel of youtubeChannelsPrepare.all()) {
         const lastVideo = await getLatestYouTubeVideo(client.rssParser, youtubeChannel.id)
-        console.log(youtubeChannel.id, lastVideo.publishDate.getTime())
         const checkLastYouTubeVideo = database
           .select({ count: count() })
           .from(youtubeChannels)
