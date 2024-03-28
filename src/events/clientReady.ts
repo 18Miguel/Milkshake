@@ -1,9 +1,10 @@
 import { ActivitiesOptions, ActivityType, Events, PresenceUpdateStatus } from 'discord.js'
-import { birthdayScheduler, Logger, loadSlashCommands, recordSlashCommands } from '../helpers'
+import { sql } from 'drizzle-orm'
+import RSSParser from 'rss-parser'
+import { birthdayScheduler, Logger, loadSlashCommands, recordSlashCommands, loadYouTubeNotifier } from '../helpers'
 import { IMilkshakeClient } from '../interfaces/milkshakeClient'
 import { IEventHandler } from '../interfaces/eventHandler'
 import { database, guilds } from '../database'
-import { sql } from 'drizzle-orm'
 
 const prepareGuildInsert = database.insert(guilds).values({ id: sql.placeholder('id') }).prepare()
 
@@ -28,6 +29,9 @@ async function handleClientReady(client: IMilkshakeClient) {
   }, 1000 * 60)
 
   client.logger = new Logger(client)
+  client.rssParser = new RSSParser({
+    headers: { 'Cache-Control': 'max-age=0' }
+  })
 
   try {
     client.guilds.valueOf().forEach((guild) => {
@@ -38,6 +42,7 @@ async function handleClientReady(client: IMilkshakeClient) {
   await loadSlashCommands(client)
   await recordSlashCommands(client)
   await birthdayScheduler(client)
+  await loadYouTubeNotifier(client)
   
   client.logger.log('Milkshake', `${client.user?.displayName} is ready to taste!`)
   client.logger.logDiscord(`${client.user?.displayName} is ready to taste!`)

@@ -37,10 +37,9 @@ async function handleAddBirthday(interaction: ChatInputCommandInteraction) {
 
   await database.insert(users)
     .values({ id: userID, birthdayDate: birthdayDate })
-    .catch(async (_) => {
-      await database.update(users)
-        .set({ birthdayDate: birthdayDate })
-        .where(eq(users.id, userID))
+    .onConflictDoUpdate({
+      target: users.id,
+      set: { birthdayDate: birthdayDate },
     })
   await database.insert(guildsToUsers)
     .values({ guildId: interaction.guildId!, userId: userID })

@@ -34,18 +34,19 @@ export const guildsToUsersRelations = relations(guildsToUsers, ({ one }) => ({
   user: one(users, { fields: [guildsToUsers.userId], references: [users.id] }),
 }))
 
-export const youTubeChannels = sqliteTable('youtube_channels', {
+export const youtubeChannels = sqliteTable('youtube_channels', {
   id: text('id').primaryKey(),
+  lastVideoId: text('last_video_id'),
 })
 
-export const youTubeSubscriptions = sqliteTable('youtube_subscriptions', {
+export const youtubeSubscriptions = sqliteTable('youtube_subscriptions', {
   id: text('id').$defaultFn(() => createId()).primaryKey(),
-  youTubeChannelId: text('youtube_channel_id').notNull().references(() => youTubeChannels.id, { onDelete: 'cascade' }),
-  guildId: text('guild_id').notNull().references(() => guilds.id, { onDelete: 'cascade' }),
+  youtubeChannelId: text('youtube_channel_id').notNull().references(() => youtubeChannels.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+  guildId: text('guild_id').notNull().references(() => guilds.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   guildTextChannelId: text('guild_text_channel_id').notNull(),
 })
 
-export const youTubeSubscriptionsRelations = relations(youTubeSubscriptions, ({ one }) => ({
-  youTubeChannel: one(youTubeChannels, { fields: [youTubeSubscriptions.id], references: [youTubeChannels.id] }),
-  guild: one(guilds, { fields: [youTubeSubscriptions.id], references: [guilds.id] }),
+export const youtubeSubscriptionsRelations = relations(youtubeSubscriptions, ({ one }) => ({
+  youTubeChannel: one(youtubeChannels, { fields: [youtubeSubscriptions.id], references: [youtubeChannels.id] }),
+  guild: one(guilds, { fields: [youtubeSubscriptions.id], references: [guilds.id] }),
 }))

@@ -40,7 +40,7 @@ const About: ISlashCommand = {
       .setDescription('Whipped up by the one and only one <@517085467942977536>')
       .setTimestamp()
 
-      await interaction.reply({ embeds: [aboutEmbed] })
+    await interaction.reply({ embeds: [aboutEmbed] })
   },
 }
 
