@@ -37,6 +37,7 @@ export const guildsToUsersRelations = relations(guildsToUsers, ({ one }) => ({
 export const youtubeChannels = sqliteTable('youtube_channels', {
   id: text('id').primaryKey(),
   lastVideoId: text('last_video_id'),
+  lastVideoPublishDate: integer('last_video_publish_date', { mode: 'timestamp' }),
 })
 
 export const youtubeSubscriptions = sqliteTable('youtube_subscriptions', {
