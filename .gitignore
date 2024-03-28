@@ -1,0 +1,10 @@
+# compiled output
+/dist
+/node_modules
+package-lock.json
+/src/database/migrations
+*.db
+
+# OS
+.DS_Store
+.env

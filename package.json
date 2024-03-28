@@ -1,0 +1,31 @@
+{
+  "name": "milkshake",
+  "description": "The TypeScript-Powered Discord Hero, Ready to Blend Your Server's Fun!",
+  "version": "3.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx --env-file .env src/index",
+    "start:dev": "tsx watch --env-file .env src/index",
+    "db:generate": "drizzle-kit generate:sqlite --schema src/database/schema.ts --out src/database/migrations",
+    "db:migrate": "tsx src/database/migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.9",
+    "drizzle-kit": "^0.20.14",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "@paralleldrive/cuid2": "^2.2.2",
+    "better-sqlite3": "^9.4.3",
+    "cron": "^3.1.6",
+    "discord.js": "^14.12.1",
+    "drizzle-orm": "^0.30.3",
+    "rss-parser": "^3.13.0",
+    "zod": "^3.22.4"
+  }
+}
