@@ -4,6 +4,7 @@
 package-lock.json
 /src/database/migrations
 *.db
+*.xml
 
 # OS
 .DS_Store
